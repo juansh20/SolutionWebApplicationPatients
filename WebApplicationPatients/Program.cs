@@ -4,6 +4,7 @@ using WebApplicationPatient.Models;
 using WebApplicationPatient.Repositories;
 using WebApplicationPatient.Services;
 using WebApplicationPatients.Context;
+using WebApplicationPatients.Utils;
 
 public class Program
 {
@@ -42,6 +43,24 @@ public class Program
         app.UseAuthorization();
 
         app.MapControllers();
+
+
+        //using (var scope = app.Services.CreateScope())
+        //{
+        //    var services = scope.ServiceProvider;
+
+        //    try
+        //    {
+        //        var context = services.GetRequiredService<DefaultContext>();
+        //        PatientSeeder.Seed(context, 100);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        var logger = services.GetRequiredService<ILogger<Program>>();
+        //        logger.LogError(ex, "An error occurred seeding the database.");
+        //    }
+        //}
+
 
         app.Run();
     }

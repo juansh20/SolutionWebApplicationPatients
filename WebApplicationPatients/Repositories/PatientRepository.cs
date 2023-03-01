@@ -4,6 +4,7 @@ using WebApplicationPatient.Models;
 using Dapper;
 using WebApplicationPatients.Context;
 using Microsoft.EntityFrameworkCore;
+using WebApplicationPatients.Utils;
 
 namespace WebApplicationPatient.Repositories
 {
@@ -75,6 +76,18 @@ namespace WebApplicationPatient.Repositories
                 return await _context.SaveChangesAsync();
             }
             return 0;
+        }
+
+        public bool SeedPatients(int count)
+        {
+            try
+            {
+                PatientSeeder.Seed(_context, count);
+                return true;
+            }catch(Exception ex)
+            {
+                return false;
+            }
         }
 
     }

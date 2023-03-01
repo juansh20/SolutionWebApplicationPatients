@@ -44,5 +44,11 @@ namespace WebApplicationPatient.Controllers
         {
             return await _patientService.DeletePatient(id);
         }
+
+        [HttpPost("seed/{count}")]
+        public IActionResult SeedPatients(int count)
+        {
+            return _patientService.SeedPatients(count);
+        }
     }
 }

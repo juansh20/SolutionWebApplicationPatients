@@ -77,5 +77,15 @@ namespace WebApplicationPatient.Services
             return new NoContentResult();
         }
 
+        public IActionResult SeedPatients(int count)
+        {
+            var result = _patientRepository.SeedPatients(count);
+
+            if(!result)
+                return new NotFoundResult();
+
+            return new NoContentResult();
+        }
+
     }
 }

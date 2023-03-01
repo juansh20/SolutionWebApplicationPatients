@@ -9,5 +9,6 @@ namespace WebApplicationPatient.Interfaces
         Task<int> AddPatient(Patient patient);
         Task<int> UpdatePatient(int id, Patient patient);
         Task<int> DeletePatient(int id);
+        bool SeedPatients(int count);
     }
 }

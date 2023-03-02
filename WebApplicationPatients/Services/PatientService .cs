@@ -1,4 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
+using System;
+using System.Threading.Tasks;
 using WebApplicationPatient.Interfaces;
 using WebApplicationPatient.Models;
 using Microsoft.AspNetCore.Mvc.Core;
@@ -9,11 +12,13 @@ namespace WebApplicationPatient.Services
     {
         private readonly IPatientRepository _patientRepository;
         private readonly PatientValidator _patientValidator;
+        private readonly IMemoryCache _cache;
 
-        public PatientService(IPatientRepository patientRepository, PatientValidator patientValidator)
+        public PatientService(IPatientRepository patientRepository, PatientValidator patientValidator, IMemoryCache memoryCache)
         {
             _patientRepository = patientRepository;
             _patientValidator = patientValidator;
+            _cache = memoryCache;
         }
 
         //public async Task<IActionResult> GetAllPatients()
@@ -24,17 +29,36 @@ namespace WebApplicationPatient.Services
 
         public async Task<IActionResult> GetAllPatients(int pageNumber, int pageSize)
         {
+            string cacheKey = $"all-patients-{pageNumber}-{pageSize}";
+
+            // Check if the result is in cache
+            if (_cache.TryGetValue(cacheKey, out IActionResult result))
+            {
+                return result;
+            }
+
             var patients = await _patientRepository.GetAllPatients(pageNumber, pageSize);
-            return new OkObjectResult(patients);
+            result = new OkObjectResult(patients);
+
+            // Cache the result for 60 minutes
+            _cache.Set(cacheKey, result, TimeSpan.FromMinutes(60));
+
+            return result;
         }
 
         public async Task<IActionResult> GetPatientById(int id)
         {
-            var patient = await _patientRepository.GetPatientById(id);
-
-            if (patient == null)
+            Patient patient;
+            if (!_cache.TryGetValue($"Patient-{id}", out patient))
             {
-                return new NotFoundResult();
+                patient = await _patientRepository.GetPatientById(id);
+
+                if (patient == null)
+                {
+                    return new NotFoundResult();
+                }
+
+                _cache.Set($"Patient-{id}", patient, TimeSpan.FromMinutes(60)); // almacenar en caché por 60 minutos
             }
 
             return new OkObjectResult(patient);
@@ -49,6 +73,7 @@ namespace WebApplicationPatient.Services
             }
 
             var id = await _patientRepository.AddPatient(patient);
+            _cache.Remove("Patients");
 
             return new CreatedAtRouteResult("GetPatientById", new { id }, patient);
         }
@@ -67,7 +92,8 @@ namespace WebApplicationPatient.Services
             {
                 return new NotFoundResult();
             }
-
+            _cache.Remove("Patients");
+            _cache.Remove($"Patient-{id}");
             return new NoContentResult();
         }
 
@@ -79,7 +105,8 @@ namespace WebApplicationPatient.Services
             {
                 return new NotFoundResult();
             }
-
+            _cache.Remove("Patients");
+            _cache.Remove($"Patient-{id}");
             return new NoContentResult();
         }
 
@@ -90,6 +117,7 @@ namespace WebApplicationPatient.Services
             if(!result)
                 return new NotFoundResult();
 
+            _cache.Remove("Patients");
             return new NoContentResult();
         }
 

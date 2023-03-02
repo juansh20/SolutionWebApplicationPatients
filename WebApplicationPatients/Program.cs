@@ -28,6 +28,7 @@ public class Program
         //services
         builder.Services.AddTransient<PatientValidator>();
         builder.Services.AddTransient<IPatientService, PatientService>();
+        builder.Services.AddMemoryCache();
 
         var app = builder.Build();
 

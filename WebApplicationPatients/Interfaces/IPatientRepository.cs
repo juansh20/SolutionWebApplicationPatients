@@ -1,10 +1,12 @@
-﻿using WebApplicationPatient.Models;
+﻿
+using WebApplicationPatient.Models;
+using WebApplicationPatients.Utils;
 
 namespace WebApplicationPatient.Interfaces
 {
     public interface IPatientRepository
     {
-        Task<List<Patient>> GetAllPatients();
+        Task<PagedResult<Patient>> GetAllPatients(int pageNumber, int pageSize);
         Task<Patient> GetPatientById(int id);
         Task<int> AddPatient(Patient patient);
         Task<int> UpdatePatient(int id, Patient patient);

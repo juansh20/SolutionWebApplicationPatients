@@ -15,10 +15,17 @@ namespace WebApplicationPatient.Controllers
             _patientService = patientService;
         }
 
+        //[HttpGet]
+        //public async Task<IActionResult> GetAllPatients()
+        //{
+        //    return await _patientService.GetAllPatients();
+        //}
+
         [HttpGet]
-        public async Task<IActionResult> GetAllPatients()
+        public async Task<IActionResult> GetAllPatients(int pageNumber = 1, int pageSize = 10)
         {
-            return await _patientService.GetAllPatients();
+            var result = await _patientService.GetAllPatients(pageNumber, pageSize);
+            return Ok(result);
         }
 
         [HttpGet("{id}", Name = "GetPatientById")]

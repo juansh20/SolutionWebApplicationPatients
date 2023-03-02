@@ -16,9 +16,15 @@ namespace WebApplicationPatient.Services
             _patientValidator = patientValidator;
         }
 
-        public async Task<IActionResult> GetAllPatients()
+        //public async Task<IActionResult> GetAllPatients()
+        //{
+        //    var patients = await _patientRepository.GetAllPatients();
+        //    return new OkObjectResult(patients);
+        //}
+
+        public async Task<IActionResult> GetAllPatients(int pageNumber, int pageSize)
         {
-            var patients = await _patientRepository.GetAllPatients();
+            var patients = await _patientRepository.GetAllPatients(pageNumber, pageSize);
             return new OkObjectResult(patients);
         }
 

@@ -1,7 +1,6 @@
 ﻿using Microsoft.Data.SqlClient;
 using WebApplicationPatient.Interfaces;
 using WebApplicationPatient.Models;
-using Dapper;
 using WebApplicationPatients.Context;
 using Microsoft.EntityFrameworkCore;
 using WebApplicationPatients.Utils;
@@ -19,10 +18,34 @@ namespace WebApplicationPatient.Repositories
             _context = context;
         }
 
-        public async Task<List<Patient>> GetAllPatients()
+        public async Task<List<Patient>> GetPagedPatients(int startIndex, int pageSize)
         {
-            return await _context.Patients.ToListAsync();
+            return await _context.Patients.Skip(startIndex).Take(pageSize).ToListAsync();
         }
+
+        public async Task<PagedResult<Patient>> GetAllPatients(int pageNumber, int pageSize)
+        {
+            var totalCount = await _context.Patients.CountAsync();
+            var totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
+
+            if (pageNumber > totalPages)
+            {
+                pageNumber = totalPages;
+            }
+
+            var startIndex = (pageNumber - 1) * pageSize;
+            var patients = await GetPagedPatients(startIndex, pageSize);
+
+            var pagedList = PagedList<Patient>.ToPagedList(patients, pageNumber, pageSize);
+            var pagedResult = new PagedResult<Patient>(pagedList, totalCount);
+
+            return pagedResult;
+        }
+
+        //public async Task<List<Patient>> GetAllPatients()
+        //{
+        //    return await _context.Patients.ToListAsync();
+        //}
 
         public async Task<Patient> GetPatientById(int id)
         {

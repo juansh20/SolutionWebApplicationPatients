@@ -63,8 +63,9 @@ public class Program
         builder.Services.AddSwaggerGen();
 
         //connection database
-        builder.Services.AddDbContext<DefaultContext>(options => options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
-
+        builder.Services.AddDbContext<DefaultContext>(options =>
+                        options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")),
+             ServiceLifetime.Transient);
         //repositories
         builder.Services.AddScoped<IPatientRepository, PatientRepository>();
         builder.Services.AddScoped<IUserRepository, UserRepository>();

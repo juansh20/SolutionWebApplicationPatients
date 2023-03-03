@@ -54,9 +54,15 @@ namespace WebApplicationPatient.Repositories
 
         public async Task<int> AddPatient(Patient patient)
         {
-            _context.Patients.Add(patient);
-            await _context.SaveChangesAsync();
-            return patient.iId;
+            try
+            {
+                _context.Patients.Add(patient);
+                await _context.SaveChangesAsync();
+                return patient.iId;
+            }catch(Exception ex)
+            {
+                throw ex;
+            }
         }
 
         public async Task<int> UpdatePatient(int id, Patient patient)
